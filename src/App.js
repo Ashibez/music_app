@@ -7,25 +7,29 @@ function App() {
       title: "First Song",
       artist: "Artist One",
       img_src: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&h=300&fit=crop",
-      src: "./sound/first.mp3"
+      src: "./sound/first.mp3",
+      duration: 180
     },
     {
       title: "Second Song",
       artist: "Artist Two",
       img_src: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=300&h=300&fit=crop",
-      src: "./sound/second.mp3"
+      src: "./sound/second.mp3",
+      duration: 180
     },
     {
       title: "Third Song",
       artist: "Artist Three",
       img_src: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-      src: "./sound/third.mp3"
+      src: "./sound/third.mp3",
+      duration: 180
     },
     {
       title: "Fourth Song",
       artist: "Artist Four",
       img_src: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=300&h=300&fit=crop",
-      src: "./sound/fourth.mp3"
+      src: "./sound/fourth.mp3",
+      duration: 180
     }
   ]);
 
@@ -77,42 +81,6 @@ function App() {
     }
     setIsPlaying(!isPlaying);
   };
-
-  const loadSongDuration = (songSrc) => {
-    const audio = new Audio(songSrc);
-    audio.addEventListener('loadedmetadata', () => {
-      setSongDurations(prev => ({
-        ...prev,
-        [songSrc]: audio.duration
-      }));
-    });
-  };
-
-  useEffect(() => {
-    const loadAssets = async () => {
-      try {
-        const startTime = Date.now();
-        
-        // Load song durations
-        await Promise.all(songs.map(song => loadSongDuration(song.src)));
-        
-        // Ensure minimum loading time of 2 seconds
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(2000 - elapsedTime, 0);
-        
-        setTimeout(() => {
-          setIsInitialLoading(false);
-        }, remainingTime);
-        
-      } catch (error) {
-        console.error('Error loading assets:', error);
-        showNotification('Error loading some assets', 'error');
-        setIsInitialLoading(false);
-      }
-    };
-
-    loadAssets();
-  }, [songs, showNotification]);
 
   const toggleMute = () => {
     audioRef.current.muted = !isMuted;
@@ -183,7 +151,11 @@ function App() {
   };
 
   const onLoadedMetadata = () => {
-    setDuration(audioRef.current.duration);
+    if (audioRef.current.duration && !isNaN(audioRef.current.duration)) {
+      setDuration(audioRef.current.duration);
+    } else {
+      setDuration(180);
+    }
   };
 
   const onProgressChange = (e) => {
@@ -395,14 +367,6 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    if (spotifyToken) {
-      fetchSpotifyUserProfile();
-      fetchSpotifyPlaylists();
-      fetchSpotifyTracks();
-    }
-  }, [spotifyToken, fetchSpotifyUserProfile, fetchSpotifyPlaylists, fetchSpotifyTracks]);
-
   const fetchSpotifyUserProfile = useCallback(async () => {
     if (!spotifyToken) return;
     
@@ -415,10 +379,9 @@ function App() {
       const data = await response.json();
       setSpotifyUser(data);
     } catch (error) {
-      console.error('Error fetching Spotify profile:', error);
-      showNotification('Failed to fetch Spotify profile', 'error');
+      console.warn('Failed to fetch Spotify profile');
     }
-  }, [spotifyToken, showNotification]);
+  }, [spotifyToken]);
 
   const fetchSpotifyPlaylists = useCallback(async () => {
     if (!spotifyToken) return;
@@ -433,12 +396,11 @@ function App() {
       const data = await response.json();
       setSpotifyPlaylists(data.items);
     } catch (error) {
-      console.error('Error fetching Spotify playlists:', error);
-      showNotification('Failed to fetch Spotify playlists', 'error');
+      console.warn('Failed to fetch Spotify playlists');
     } finally {
       setIsLoadingSpotify(false);
     }
-  }, [spotifyToken, showNotification]);
+  }, [spotifyToken]);
 
   const fetchSpotifyTracks = useCallback(async () => {
     if (!spotifyToken) return;
@@ -453,12 +415,19 @@ function App() {
       const data = await response.json();
       setSpotifyTracks(data.items.map(item => item.track));
     } catch (error) {
-      console.error('Error fetching Spotify tracks:', error);
-      showNotification('Failed to fetch Spotify tracks', 'error');
+      console.warn('Failed to fetch Spotify tracks');
     } finally {
       setIsLoadingSpotify(false);
     }
-  }, [spotifyToken, showNotification]);
+  }, [spotifyToken]);
+
+  useEffect(() => {
+    if (spotifyToken) {
+      fetchSpotifyUserProfile();
+      fetchSpotifyPlaylists();
+      fetchSpotifyTracks();
+    }
+  }, [spotifyToken, fetchSpotifyUserProfile, fetchSpotifyPlaylists, fetchSpotifyTracks]);
 
   const createSpotifyPlaylist = async (name, description = '') => {
     if (!spotifyToken || !spotifyUser) return;
@@ -610,6 +579,81 @@ function App() {
     </div>
   );
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const loadSongDuration = (songSrc) => {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio(songSrc);
+      let hasResolved = false;
+
+      const handleSuccess = () => {
+        if (!hasResolved) {
+          hasResolved = true;
+          setSongDurations(prev => ({
+            ...prev,
+            [songSrc]: audio.duration || 180
+          }));
+          resolve();
+        }
+      };
+
+      const handleError = () => {
+        if (!hasResolved) {
+          hasResolved = true;
+          setSongDurations(prev => ({
+            ...prev,
+            [songSrc]: 180 // Fallback duration
+          }));
+          resolve(); // Resolve anyway to prevent blocking
+        }
+      };
+
+      audio.addEventListener('loadedmetadata', handleSuccess);
+      audio.addEventListener('canplaythrough', handleSuccess);
+      audio.addEventListener('error', handleError);
+
+      // Add timeout to prevent hanging
+      setTimeout(handleError, 3000);
+    });
+  };
+
+  useEffect(() => {
+    const loadAssets = async () => {
+      const startTime = Date.now();
+      
+      try {
+        // Load song durations with error handling
+        await Promise.all(
+          songs.map(song => 
+            loadSongDuration(song.src)
+              .catch(error => {
+                console.warn(`Could not load duration for: ${song.title}`, error);
+                return null;
+              })
+          )
+        );
+      } catch (error) {
+        console.warn('Non-critical error loading assets:', error);
+      } finally {
+        // Ensure minimum loading time
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(2000 - elapsedTime, 0);
+        
+        setTimeout(() => {
+          setIsInitialLoading(false);
+        }, remainingTime);
+      }
+    };
+
+    loadAssets();
+  }, [songs]);
+
   if (isInitialLoading) {
     return (
       <div className="loading-screen">
@@ -620,7 +664,7 @@ function App() {
   }
 
   return (
-    <div className={`App ${isDarkMode ? 'dark' : 'light'}`}>
+    <div className={`App ${isDarkMode ? '' : 'light'}`}>
       <nav className="side-nav">
         <div className="nav-logo">
           <i className="fas fa-compact-disc"></i>
@@ -809,8 +853,26 @@ function App() {
               ref={audioRef}
               src={songs[currentSongIndex].src}
               onTimeUpdate={onTimeUpdate}
-              onLoadedMetadata={onLoadedMetadata}
+              onLoadedMetadata={(e) => {
+                const duration = e.target.duration;
+                if (duration && !isNaN(duration)) {
+                  setDuration(duration);
+                  setSongDurations(prev => ({
+                    ...prev,
+                    [songs[currentSongIndex].src]: duration
+                  }));
+                } else {
+                  setDuration(180);
+                }
+              }}
               onEnded={playNextSong}
+              onError={(e) => {
+                console.warn('Audio playback error:', e);
+                showNotification('Could not play audio. Please try another song.', 'warning');
+                if (isPlaying) {
+                  setIsPlaying(false);
+                }
+              }}
             />
           </div>
 

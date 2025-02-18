@@ -1722,33 +1722,6 @@
   color: #1a2942;
 }
 
-.error-boundary {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #121212;
-  color: white;
-  gap: 1rem;
-}
-
-.error-boundary button {
-  padding: 0.8rem 1.5rem;
-  background: #1db954;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  font-family: 'Coiny', serif;
-  transition: all 0.2s;
-}
-
-.error-boundary button:hover {
-  background: #1ed760;
-  transform: scale(1.05);
-}
-
 /* Add content fade-in animation */
 .main-container {
   animation: contentFadeIn 0.8s ease-out;
