@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './App.css';
 
 function App() {
@@ -67,7 +67,7 @@ function App() {
     if (isPlaying) {
       audioRef.current.play();
     }
-  }, [currentSongIndex]);
+  }, [currentSongIndex, isPlaying]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -112,7 +112,7 @@ function App() {
     };
 
     loadAssets();
-  }, []);
+  }, [songs, showNotification]);
 
   const toggleMute = () => {
     audioRef.current.muted = !isMuted;
@@ -241,7 +241,9 @@ function App() {
 
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
-    setTimeout(() => setNotification({ show: false, message: '', type: '' }), 3000);
+    setTimeout(() => {
+      setNotification({ show: false, message: '', type: '' });
+    }, 3000);
   };
 
   const addToPlaylist = (song, playlistId) => {
@@ -399,9 +401,9 @@ function App() {
       fetchSpotifyPlaylists();
       fetchSpotifyTracks();
     }
-  }, [spotifyToken]);
+  }, [spotifyToken, fetchSpotifyUserProfile, fetchSpotifyPlaylists, fetchSpotifyTracks]);
 
-  const fetchSpotifyUserProfile = async () => {
+  const fetchSpotifyUserProfile = useCallback(async () => {
     if (!spotifyToken) return;
     
     try {
@@ -416,9 +418,9 @@ function App() {
       console.error('Error fetching Spotify profile:', error);
       showNotification('Failed to fetch Spotify profile', 'error');
     }
-  };
+  }, [spotifyToken, showNotification]);
 
-  const fetchSpotifyPlaylists = async () => {
+  const fetchSpotifyPlaylists = useCallback(async () => {
     if (!spotifyToken) return;
     setIsLoadingSpotify(true);
 
@@ -436,9 +438,9 @@ function App() {
     } finally {
       setIsLoadingSpotify(false);
     }
-  };
+  }, [spotifyToken, showNotification]);
 
-  const fetchSpotifyTracks = async () => {
+  const fetchSpotifyTracks = useCallback(async () => {
     if (!spotifyToken) return;
     setIsLoadingSpotify(true);
 
@@ -456,7 +458,7 @@ function App() {
     } finally {
       setIsLoadingSpotify(false);
     }
-  };
+  }, [spotifyToken, showNotification]);
 
   const createSpotifyPlaylist = async (name, description = '') => {
     if (!spotifyToken || !spotifyUser) return;
@@ -630,7 +632,7 @@ function App() {
             <i className="fa fa-home"></i>
             <span>Home</span>
           </li>
-          <li>
+          <li onClick={() => showNotification('Explore feature coming soon!', 'info')}>
             <i className="fas fa-compass"></i>
             <span>Explore</span>
           </li>
