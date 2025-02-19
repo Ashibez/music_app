@@ -67,6 +67,7 @@ function App() {
   const [isLoadingSpotify, setIsLoadingSpotify] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const searchContainerRef = useRef(null);
 
   useEffect(() => {
     if (isPlaying) {
@@ -180,6 +181,8 @@ function App() {
   const selectSong = (index) => {
     setCurrentSongIndex(index);
     setIsPlaying(true);
+    setFilteredSongs([]);
+    setSearchTerm('');
   };
 
   const handleMenuClick = (e, index) => {
@@ -333,9 +336,19 @@ function App() {
     const newRecent = [song, ...recentSearches.filter(s => s.src !== song.src)].slice(0, 5);
     setRecentSearches(newRecent);
     
-    selectSong(songs.findIndex(s => s.src === song.src));
+    const songIndex = songs.findIndex(s => s.src === song.src);
+    if (songIndex !== -1) {
+      setCurrentSongIndex(songIndex);
+      setIsPlaying(true);
+    }
+    
     setSearchTerm('');
     setFilteredSongs([]);
+    
+    if (searchContainerRef.current) {
+      const input = searchContainerRef.current.querySelector('input');
+      if (input) input.blur();
+    }
   };
 
   const connectToSpotify = () => {
@@ -655,6 +668,25 @@ function App() {
     loadAssets();
   }, [songs]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && 
+          !searchContainerRef.current.contains(event.target) && 
+          searchTerm) {
+        setFilteredSongs([]);
+        setSearchTerm('');
+        const input = searchContainerRef.current.querySelector('input');
+        if (input) input.blur();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchTerm]);
+
   if (isInitialLoading) {
     return (
       <div className="loading-screen">
@@ -711,16 +743,17 @@ function App() {
           >
             <i className="fas fa-bars"></i>
           </button>
-          <div className="search-container">
+          <div className="search-container" ref={searchContainerRef}>
             <i className="fas fa-search"></i>
             <input 
               type="text" 
               placeholder="Search for songs..." 
               value={searchTerm}
               onChange={handleSearch}
+              onClick={(e) => e.stopPropagation()}
             />
             {(searchTerm || recentSearches.length > 0) && (
-              <div className="search-results">
+              <div className="search-results" onClick={(e) => e.stopPropagation()}>
                 {searchTerm ? (
                   <>
                     <div className="search-section">
@@ -730,7 +763,12 @@ function App() {
                           <div 
                             key={index} 
                             className="search-result-item"
-                            onClick={() => handleSearchSelection(song)}
+                            onClick={() => {
+                              handleSearchSelection(song);
+                              if (searchContainerRef.current) {
+                                searchContainerRef.current.blur();
+                              }
+                            }}
                           >
                             <img src={song.img_src} alt={song.title} />
                             <div className="song-info">
@@ -761,7 +799,12 @@ function App() {
                       <div 
                         key={index} 
                         className="search-result-item"
-                        onClick={() => handleSearchSelection(song)}
+                        onClick={() => {
+                          handleSearchSelection(song);
+                          if (searchContainerRef.current) {
+                            searchContainerRef.current.blur();
+                          }
+                        }}
                       >
                         <img src={song.img_src} alt={song.title} />
                         <div className="song-info">

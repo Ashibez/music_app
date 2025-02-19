@@ -710,27 +710,27 @@
   .main-container {
     width: 100%;
     padding-left: 0;
-    min-height: 100vh;
+  min-height: 100vh;
   }
 
   .main-content {
     flex-direction: column;
-    padding: 0.5rem;
-    height: auto;
-    overflow: visible;
+    padding: 1rem;
+    gap: 1.5rem;
   }
 
   .song-list {
     width: 100%;
-    height: auto;
-    max-height: none;
-    overflow: visible;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 1rem;
   }
 
   .music-player {
     width: 100%;
-    margin-bottom: 1rem;
-    height: auto;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 1rem;
   }
 
   .side-nav {
@@ -750,6 +750,8 @@
     top: 0;
     z-index: 900;
     background: #121212;
+    padding: 0 1rem;
+    height: 50px;
   }
 
   .mobile-overlay {
@@ -788,7 +790,7 @@
 
   /* Make hamburger button more prominent */
   .hamburger-btn {
-    display: flex;
+  display: flex;
     align-items: center;
     justify-content: center;
     background: none;
@@ -819,7 +821,7 @@
 
   /* Adjust main content layout */
   .main-content {
-    flex-direction: column;
+  flex-direction: column;
     padding: 0.5rem;
   }
 
@@ -830,6 +832,77 @@
 
   .song-list {
     width: 100%;
+  }
+
+  /* Adjust song image size */
+  .song-image {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 1rem;
+  }
+
+  /* Adjust song details */
+  .song-details h2 {
+    font-size: 1.3rem;
+  }
+
+  .song-details h3 {
+    font-size: 0.9rem;
+  }
+
+  /* Adjust controls spacing */
+  .controls {
+    gap: 0.6rem;
+    margin: 1rem 0;
+  }
+
+  /* Song list adjustments */
+  .song-item {
+    padding: 0.6rem;
+  }
+
+  .song-item img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .song-info h3 {
+    font-size: 0.85rem;
+  }
+
+  .song-info p {
+    font-size: 0.75rem;
+  }
+
+  /* Search container adjustments */
+  .search-container {
+    width: 200px;
+  }
+
+  .search-results {
+    width: 280px;
+    right: -40px;
+  }
+}
+
+/* Additional adjustments for very small screens */
+@media (max-width: 360px) {
+  .main-content {
+    padding: 0.8rem;
+  }
+
+  .music-player,
+  .song-list {
+    max-width: 280px;
+  }
+
+  .song-image {
+    width: 140px;
+    height: 140px;
+  }
+
+  .search-container {
+    width: 160px;
   }
 }
 
