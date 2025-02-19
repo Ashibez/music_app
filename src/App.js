@@ -66,6 +66,7 @@ function App() {
   const [spotifyTracks, setSpotifyTracks] = useState([]);
   const [isLoadingSpotify, setIsLoadingSpotify] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (isPlaying) {
@@ -665,7 +666,7 @@ function App() {
 
   return (
     <div className={`App ${isDarkMode ? '' : 'light'}`}>
-      <nav className="side-nav">
+      <nav className={`side-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="nav-logo">
           <i className="fas fa-compact-disc"></i>
           <span>Music App</span>
@@ -704,6 +705,12 @@ function App() {
 
       <div className="main-container">
         <nav className="top-nav">
+          <button 
+            className="hamburger-btn"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <i className="fas fa-bars"></i>
+          </button>
           <div className="search-container">
             <i className="fas fa-search"></i>
             <input 
@@ -1090,6 +1097,13 @@ function App() {
       )}
 
       {isLoadingSpotify && <SpotifyLoading />}
+
+      {isMobileMenuOpen && (
+        <div 
+          className="mobile-overlay"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
     </div>
   );
 }

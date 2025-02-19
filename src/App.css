@@ -4,9 +4,10 @@
 
 .App {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   background: #121212;
   color: white;
+  position: relative;
   overflow: hidden;
   font-family: "DynaPuff", serif;
   font-optical-sizing: auto;
@@ -701,52 +702,162 @@
 }
 
 @media (max-width: 768px) {
-  .side-nav {
-    width: 80px;
-  }
-  
-  .nav-logo span,
-  .nav-items span,
-  .nav-options span {
-    display: none;
+  .App {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
-  .search-container {
-    width: 200px;
+  .main-container {
+    width: 100%;
+    padding-left: 0;
+    min-height: 100vh;
   }
-  
+
+  .main-content {
+    flex-direction: column;
+    padding: 0.5rem;
+    height: auto;
+    overflow: visible;
+  }
+
+  .song-list {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .music-player {
+    width: 100%;
+    margin-bottom: 1rem;
+    height: auto;
+  }
+
+  .side-nav {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    bottom: 0;
+    width: 80%;
+    max-width: 300px;
+    z-index: 1000;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
   .top-nav {
-    padding: 0 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    background: #121212;
+  }
+
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100vh;
+  }
+
+  /* Show side nav when mobile menu is open */
+  .side-nav.mobile-open {
+    left: 0;
+    visibility: visible;
+  }
+
+  /* Light mode side nav */
+  .App.light .side-nav {
+    background: #ffffff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Enhance overlay */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    animation: fadeIn 0.3s ease-out;
+    backdrop-filter: blur(3px);
+  }
+
+  /* Make hamburger button more prominent */
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    z-index: 1001;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .hamburger-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .App.light .hamburger-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  /* Adjust main container to take full width */
+  .main-container {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  /* Adjust main content layout */
+  .main-content {
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+
+  .music-player {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .song-list {
+    width: 100%;
   }
 }
 
-@media (max-width: 480px) {
-  .App {
-    flex-direction: column;
+/* Hide hamburger on desktop */
+@media (min-width: 769px) {
+  .hamburger-btn {
+    display: none;
   }
-  
-  .side-nav {
-    width: 100%;
-    padding: 1rem;
-  }
-  
-  .main-content {
-    padding: 1rem;
-  }
-  
-  .music-player {
-    width: 90%;
-    padding: 1rem;
-  }
+}
 
-  .song-image {
-    width: 220px;
-    height: 220px;
+/* Add animation for mobile menu */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
   }
+  to {
+    transform: translateX(0);
+  }
+}
 
-  .search-container {
-    width: 150px;
-  }
+/* Light mode adjustments */
+.App.light .hamburger-btn {
+  color: #1a2942;
+}
+
+.App.light .mobile-overlay {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(5px);
 }
 
 .App.light .song-item {
