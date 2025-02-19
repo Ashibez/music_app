@@ -4,7 +4,7 @@
 
 .App {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background: #121212;
   color: white;
   position: relative;
@@ -259,7 +259,7 @@
   padding: 0.8rem;
   gap: 0.8rem;
   overflow: hidden;
-  height: calc(100vh - 45px);
+  height: calc(100vh - 55px);
 }
 
 /* Update song list */
@@ -269,7 +269,8 @@
   border-radius: 20px;
   padding: 0.8rem;
   overflow-y: auto;
-  height: calc(100vh - 45px - 1.6rem);
+  height: calc(100vh - 75px);
+  max-height: 600px;
   animation: slideInUp 0.8s ease-out;
   animation-fill-mode: both;
   animation-delay: 0.4s;
@@ -441,7 +442,7 @@
   margin: 0 auto;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 20px;
-  padding: 0.8rem;
+  padding: 1rem;
   text-align: center;
   animation: slideInUp 0.8s ease-out;
   animation-fill-mode: both;
@@ -454,9 +455,9 @@
 }
 
 .song-image {
-  width: 180px;
-  height: 180px;
-  margin: 0 auto 0.6rem;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 1rem;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
@@ -703,34 +704,40 @@
 
 @media (max-width: 768px) {
   .App {
+    height: auto;
+    min-height: 100vh;
     overflow-y: auto;
-    overflow-x: hidden;
   }
 
   .main-container {
     width: 100%;
     padding-left: 0;
-  min-height: 100vh;
   }
 
   .main-content {
     flex-direction: column;
-    padding: 1rem;
-    gap: 1.5rem;
+    padding: 0.8rem;
+    gap: 1rem;
+    height: auto;
+    min-height: calc(100vh - 50px);
+    overflow-y: auto;
   }
 
   .song-list {
     width: 100%;
     max-width: 320px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 0.8rem;
+    height: auto;
+    max-height: none;
   }
 
   .music-player {
     width: 100%;
     max-width: 320px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 0.8rem;
+    height: auto;
   }
 
   .side-nav {
@@ -740,9 +747,13 @@
     bottom: 0;
     width: 80%;
     max-width: 300px;
-    z-index: 1000;
-    height: 100vh;
+    height: 100%;
+    max-height: 100vh;
     overflow-y: auto;
+    z-index: 1000;
+    transition: all 0.3s ease-in-out;
+    background: #121212;
+    padding: 1rem;
   }
 
   .top-nav {
@@ -836,9 +847,9 @@
 
   /* Adjust song image size */
   .song-image {
-    width: 160px;
-    height: 160px;
-    margin: 0 auto 1rem;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 0.8rem;
   }
 
   /* Adjust song details */
@@ -883,12 +894,21 @@
     width: 280px;
     right: -40px;
   }
+
+  /* Adjust nav items spacing */
+  .nav-items {
+    gap: 0.2rem;
+  }
+
+  .nav-items li {
+    padding: 0.4rem 0.6rem;
+  }
 }
 
 /* Additional adjustments for very small screens */
 @media (max-width: 360px) {
   .main-content {
-    padding: 0.8rem;
+    padding: 0.6rem;
   }
 
   .music-player,
@@ -897,8 +917,8 @@
   }
 
   .song-image {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
   }
 
   .search-container {
